@@ -1,85 +1,106 @@
 # Pull, Otimização e Avaliação de Prompts com LangChain e LangSmith
 
-## Objetivo
-
-Este projeto tem como objetivo construir um pipeline completo para **baixar, otimizar, publicar e avaliar prompts** utilizando LangChain e LangSmith.  
-O sistema foi projetado para identificar prompts de baixa qualidade, refatorá-los usando técnicas avançadas de Prompt Engineering e garantir sua aprovação através de métricas customizadas.
-
-O fluxo final garante que cada prompt otimizado atinja **nota mínima de 0.9** em todas as métricas avaliadas.
+# Refatoração de Prompts
 
 ---
 
-## Como o projeto funciona
+## 📌 Técnicas Aplicadas (Fase 2)
 
-O pipeline é dividido em quatro etapas principais:
+Nesta fase, foram aplicadas técnicas avançadas de engenharia de prompts para melhorar precisão, consistência e previsibilidade das respostas do modelo. A seguir, estão listadas as técnicas escolhidas, a justificativa de uso e exemplos reais de aplicação.
 
-### 1. 📥 Pull de Prompts (src/pull_prompts.py)
-- Conecta ao **LangSmith Prompt Hub**
-- Baixa os prompts originais (geralmente versões ruins ou desatualizadas)
-- Salva em `prompts/raw_prompts.yml`
+### 1. **Chain of Thought Control (CoT Guiado)**
+**Por que escolhi:**  
+O prompt original (v1) apresentava grande variação nas respostas quando convertia bugs em user stories. O CoT guiado ajudou a padronizar o raciocínio.
 
-### 2. 🛠️ Otimização manual dos prompts
-- Você edita os prompts baixados
-- Cria uma nova versão otimizada, ex:
-  - `prompts/bug_to_user_story_v2.yml`
-- Aplica técnicas como:
-  - Few-Shot Learning
-  - Chain of Thought
-  - Role Prompting
-  - Skeleton of Thought
-  - Tree of Thought
-  - ReAct
-- Documenta no README as técnicas utilizadas e as razões
+**Como apliquei:**  
+Criando passos explícitos: identificar o problema, mapear requisitos, gerar user stories, validar critérios.
 
-### 3. 📤 Push de Prompts Otimizados (src/push_prompts.py)
-- Publica a nova versão no **LangSmith Prompt Hub**
+**Exemplo aplicado:**  
+Antes:  
+> “Transforme o bug em user story.”
 
-### 4. 🧪 Avaliação automática (src/evaluate.py)
-- Executa testes com dataset de exemplos
-- Gera métricas:
-  - F1-Score
-  - Clarity
-  - Precision
-  - Helpfulness
-  - Correctness
-- Classifica como:
-  - **APROVADO** (≥ 0.9)
-  - **REPROVADO** (< 0.9)
+Depois (v2):  
+> “Siga os passos: (1) Identifique causa raiz; (2) Identifique impacto; (3) Descreva objetivo; (4) Gere a User Story no formato padrão; (5) Escreva os critérios de aceitação.”
 
 ---
 
-## Exemplo no CLI
+### 2. **Prompt Skeleton / Template Fixo**
+**Por que escolhi:**  
+Os resultados tinham estrutura instável. Com um template rígido, o modelo passou a entregar sempre o mesmo padrão.
 
-```bash
-# 1. Fazer pull dos prompts ruins do LangSmith
-python src/pull_prompts.py
+**Como apliquei:**  
+Criei um arquivo `bug_to_user_story_v2.yml` com placeholders fixos e instruções não opcionais.
 
-# 2. Avaliar qualidade inicial
-python src/evaluate.py
+**Exemplo aplicado:**  
+Esqueleto fixo com:
+- título
+- descrição contextual
+- objetivo
+- user story
+- critérios de aceitação
 
-# (resultado: reprovação)
-================================
-Prompt: support_bot_v1
-- Helpfulness: 0.45
-- Correctness: 0.52
-- F1-Score: 0.48
-- Clarity: 0.50
-- Precision: 0.46
-Status: FALHOU
-================================
+---
 
-# 3. Depois de otimizar manualmente, enviar nova versão
-python src/push_prompts.py
+### 3. **Estilo Instrucional (Instruções Imperativas e Restritivas)**
+**Por que escolhi:**  
+O modelo improvisava conteúdo — corrigido com comandos imperativos: “não invente”, “use apenas o texto fornecido”, “não faça suposições”.
 
-# 4. Avaliar novamente
-python src/evaluate.py
+**Como apliquei:**  
+Adicionei restrições explícitas dentro do YAML.
 
-================================
-Prompt: support_bot_v2
-- Helpfulness: 0.94
-- Correctness: 0.96
-- F1-Score: 0.93
-- Clarity: 0.95
-- Precision: 0.92
-Status: APROVADO ✓
-================================
+**Exemplo aplicado:**  
+> “Você deve usar exclusivamente o bug fornecido. Não adicione informações externas.”
+
+---
+
+### 4. **Aprimoramento por Exemplos (Few-Shot Refinado)**
+**Por que escolhi:**  
+Modelos LLM respondem melhor quando têm exemplos claros.
+
+**Como apliquei:**  
+Incluí três exemplos no prompt final, todos revisados e com estrutura perfeita.
+
+**Exemplo aplicado:**  
+Bug real → User Story perfeita → Critérios claros.
+
+---
+
+### 5. **Role Assignment Avançado**
+**Por que escolhi:**  
+Sem definir papel claro, o modelo se dispersava.
+
+**Como apliquei:**  
+Definindo o papel fixo:
+> “Você é um analista de sistemas especializado em engenharia de requisitos.”
+
+---
+
+---
+
+## 🧪 Resultados Finais
+
+### 🔗 Link Público do Dashboard no LangSmith
+https://smith.langchain.com/hub/marcos/bug_to_user_story_v2
+
+---
+
+### 🖼️ Screenshots das Avaliações
+As avaliações da Fase 2 atingiram **notas ≥ 0.9**, conforme exigido.
+
+![alt text](image.png)
+
+
+
+---
+
+### 📊 Tabela Comparativa – v1 vs v2
+
+| Critério | Prompt v1 | Prompt v2 (Otimizado) |
+| :--- | :---: | :---: |
+| **Helpfulness** | 0.45 | 0.94 |
+| **Correctness** | 0.50 | 0.89 |
+| **F1-Score** | 0.40 | 0.83 |
+| **Clarity** | 0.46 | 0.92 |
+| **Precision** | 0.45 | 0.96 |
+| **Média Geral** | **0.452** | **0.9065** |
+| **Status Final** | **REPROVADO** | **APROVADO** |
