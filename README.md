@@ -4,7 +4,57 @@
 
 ---
 
-## 📌 Técnicas Aplicadas (Fase 2)
+# Como Executar o projeto
+
+A seguir estão todas as instruções necessárias para executar o projeto, desde instalação, preparação do ambiente, execução dos prompts e avaliação no LangSmith.
+
+---
+
+## Pré-requisitos
+
+Antes de iniciar, você deve ter:
+
+### Python 3.10+ instalado
+Verifique com:
+```bash
+python --version
+```
+
+# Configurar conta no LangSmith
+```bash
+export LANGCHAIN_TRACING_V2="true"
+export LANGCHAIN_API_KEY="SUA_API_KEY"
+export LANGCHAIN_PROJECT="bug_to_user_story_v2"
+```
+
+# LLM Configuration
+```bash
+LLM_PROVIDER=google
+LLM_MODEL=gemini-2.5-flash
+EVAL_MODEL=gemini-2.5-flash
+```
+
+## Ordem de execução
+
+> Executar pull dos prompts ruins
+```bash
+python src/pull_prompts.py
+```
+
+### Refatorar prompts
+Edite manualmente o arquivo prompts/bug_to_user_story_v2.yml
+
+> Fazer push do prompt otimizado
+```bash
+python src/push_prompts.py
+```
+
+> Executar avaliação
+```bash
+python src/evaluate.py
+```
+
+## Técnicas Aplicadas (Fase 2)
 
 Nesta fase, foram aplicadas técnicas avançadas de engenharia de prompts para melhorar precisão, consistência e previsibilidade das respostas do modelo. A seguir, estão listadas as técnicas escolhidas, a justificativa de uso e exemplos reais de aplicação.
 
